@@ -110,7 +110,7 @@
     }
 
     function formatarCPF(cpf) {
-        if (!cpf) return ''; // Retorna uma string vazia se cpf for undefined
+        if (!cpf) return ''; 
 
         let valor = cpf.replace(/\D/g, '');
         if (valor.length === 11) {
@@ -124,21 +124,19 @@
     function getIdFromUrl() {
         var url = window.location.href;
         var parts = url.split('/');
-        return parts[parts.length - 1]; // Último valor da URL, que seria o ID
+        return parts[parts.length - 1]; 
     }
 
     var IdCliente = getIdFromUrl();
 
     function Dialog() {
-        // Faz uma chamada AJAX para verificar se o cliente existe
-        console.log(IdCliente);
+        
         $.ajax({
             url: '/Beneficiario/VerificarClienteExistente',
             type: 'GET',
             data: { idCliente: IdCliente },
             success: function (clienteExiste) {
                 if (clienteExiste) {
-                    // Se o cliente existir, cria o modal e o exibe
                     var random = Math.random().toString().replace('.', '');
                     var texto = '<div id="' + random + '" class="modal fade">                                                               ' +
                         '        <div class="modal-dialog">                                                                                 ' +
@@ -190,10 +188,8 @@
                     $('body').append(texto);
                     $('#' + random).modal('show');
 
-                    // Carrega beneficiários para o modal
                     carregarBeneficiarios(IdCliente);
                 } else {
-                    // Se o cliente não existir, exibe uma mensagem de erro
                     alert('Cliente não encontrado. Por favor, cadastre um cliente antes de adicionar beneficiários.');
                 }
             },
@@ -231,7 +227,6 @@
                 }
             },
             error: function () {
-                console.log("Erro ao carregar beneficiário!");
             }
         });
     }
@@ -249,7 +244,6 @@
             contentType: 'application/json',
             data: JSON.stringify(beneficiario),
             success: function (response) {
-                console.log("Resposta do servidor:", response);
                 var newRow = '<tr>' +
                     '    <td>' + response.CPF + '</td>' +
                     '    <td>' + response.Nome + '</td>' +
@@ -288,7 +282,6 @@
 
     function alterarBeneficiario(idBeneficiario) {
 
-        console.log("alterarBeneficiario chamado com id: " + idBeneficiario);
         IdBeneficiarioAtual = idBeneficiario;
 
         $.ajax({
@@ -296,9 +289,7 @@
             type: 'GET',
             data: { id: idBeneficiario },
             success: function (response) {
-                console.log("Resposta recebida: ", response);
 
-                // Preencher os campos do modal
                 $('#cpf').val(response.cpf);
                 $('#Name').val(response.nome);
                 $('#Id').val(response.id);
@@ -308,10 +299,8 @@
                     var row = $(this);
                     var hiddenId = row.find('.beneficiarioId').val();
 
-                    console.log("ID oculto na linha:", hiddenId, "ID retornado:", idBeneficiario); // Debug
 
                     if (hiddenId == idBeneficiario.toString()) {
-                        console.log("Linha encontrada, alterando inputs."); // Debug
                         row.find('td').eq(0).html('<input type="text" class="form-control" value="' + response.cpf + '" oninput="mascaraCPF(this)" maxlength="14" />');
                         row.find('td').eq(1).html('<input type="text" class="form-control" value="' + response.nome + '" maxlength="20" />');
                         row.find('td').eq(2).html('<button class="btn btn-danger btn-sm" onclick="salvarAlteracao()">Salvar</button>');
@@ -326,13 +315,11 @@
 
     function salvarAlteracao() {
         var beneficiario = {
-            Id: IdBeneficiarioAtual, // Usa o campo oculto para o ID
-            IdCliente: IdCliente, // ID do cliente agora armazenado corretamente
+            Id: IdBeneficiarioAtual, 
+            IdCliente: IdCliente, 
             CPF: $('#beneficiariosBody tr input').eq(0).val(),
             Nome: $('#beneficiariosBody tr input').eq(1).val()
         };
-
-        console.log("Beneficiário para salvar:", beneficiario); // Confere os dados no console
 
         $.ajax({
             url: '/Beneficiario/AlterarBeneficiario',
@@ -343,14 +330,14 @@
                 $('#beneficiariosBody tr').each(function () {
                     var row = $(this);
                     if (row.find('.beneficiarioId').val() == beneficiario.Id) {
-                        row.find('td').eq(0).text(formatarCPF(beneficiario.CPF)); // Atualiza o CPF
-                        row.find('td').eq(1).text(beneficiario.Nome); // Atualiza o Nome
+                        row.find('td').eq(0).text(formatarCPF(beneficiario.CPF)); 
+                        row.find('td').eq(1).text(beneficiario.Nome); 
                     }
                 });
                 alert('Alteração realizada com sucesso!');
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.error('Erro:', textStatus, errorThrown);
+                
                 alert('Erro ao salvar as alterações do beneficiário. ' + textStatus + ': ' + errorThrown);
             }
         });

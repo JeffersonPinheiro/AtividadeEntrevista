@@ -51,7 +51,7 @@ namespace WebAtividadeEntrevista.Controllers
         public JsonResult VerificarClienteExistente(long idCliente)
         {
             BoCliente bo = new BoCliente();
-            var clienteExiste = bo.Consultar(idCliente) != null; // True se existe, false se não
+            var clienteExiste = bo.Consultar(idCliente) != null; 
             return Json(clienteExiste, JsonRequestBehavior.AllowGet);
         }
 
@@ -93,7 +93,6 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult AlterarBeneficiario(BeneficiarioModel model)
         {
-            // Verifica se o IdCliente é nulo ou não é válido
             if (model.IdCliente <= 0)
             {
                 return Json("Por favor, cadastre um cliente antes de alterar beneficiários.");
@@ -103,10 +102,8 @@ namespace WebAtividadeEntrevista.Controllers
             Beneficiario beneficiario = bo.Consultar(model.Id);
             model.CPF = model.NormalizarCPF(model.CPF);
 
-            // Verifica se o CPF já existe
             var cpfExiste = bo.VerificarExistencia(model.CPF);
 
-            // Verifica se o beneficiário existe
             if (beneficiario.Id == model.Id)
             {
                 bo.Alterar(new Beneficiario()
