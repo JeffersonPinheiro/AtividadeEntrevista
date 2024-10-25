@@ -1,0 +1,361 @@
+﻿
+<form id="formCadastro" method="post" novalidate onsubmit="salvarAlteracao()" ;>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Nome">Nome:</label>
+                <input required="required" type="text" class="form-control" id="Nome" name="Nome" placeholder="Ex.: João" maxlength="50">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Sobrenome">Sobrenome:</label>
+                <input required="required" type="text" class="form-control" id="Sobrenome" name="Sobrenome" placeholder="Ex.: da Silva" maxlength="255">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="CPF">CPF:</label>
+                <input required="required" type="text" class="form-control" id="CPF" name="CPF" placeholder="Ex.: 999.999.999-99" oninput="mascaraCPF(this)" maxlength="14">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Nacionalidade">Nacionalidade:</label>
+                <input required="required" type="text" class="form-control" id="Nacionalidade" name="Nacionalidade" placeholder="Ex.: brasileira" maxlength="50">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="CEP">CEP:</label>
+                <input required="required" type="text" class="form-control" id="CEP" name="CEP" placeholder="Ex.: 01011-100" maxlength="9">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="Estado">Estado:</label>
+                <select required="required" id="Estado" class="form-control" name="Estado">
+                    <option value="">Selecione</option>
+                    <option value="SP">São Paulo</option>
+                    <option value="PE">Pernambuco</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="Cidade">Cidade:</label>
+                <input required="required" type="text" class="form-control" id="Cidade" name="Cidade" maxlength="50" placeholder="Ex.: São Paulo">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="Logradouro">Logradouro:</label>
+                <input required="required" type="text" class="form-control" id="Logradouro" name="Logradouro" placeholder="Ex.: Rua Boa Vista 253" maxlength="500">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Email">E-mail:</label>
+                <input required="required" type="text" class="form-control" id="Email" name="Email" placeholder="Ex.: email@email.com" maxlength="2079">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Telefone">Telefone:</label>
+                <input required="required" type="tel" class="form-control" id="Telefone" name="Telefone" placeholder="Ex.: (11) 2020-3030" maxlength="15">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="pull-right">
+                <button type="submit" class="btn btn-sm btn-success">Salvar</button>
+                @Html.ActionLink("Voltar", "Index", "Cliente", new { }, new { @class = "btn btn-sm btn-danger" })
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="pull-left">
+                <button type="button" class="btn btn-primary" onclick="Dialog()">Beneficiários</button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<script>
+    function mascaraCPF(input) {
+        let valor = input.value.replace(/\D/g, '');
+
+        if (valor.length <= 11) {
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+
+        input.value = valor;
+    }
+
+    function formatarCPF(cpf) {
+        if (!cpf) return ''; // Retorna uma string vazia se cpf for undefined
+
+        let valor = cpf.replace(/\D/g, '');
+        if (valor.length === 11) {
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+            valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+        return valor;
+    }
+
+    function getIdFromUrl() {
+        var url = window.location.href;
+        var parts = url.split('/');
+        return parts[parts.length - 1]; // Último valor da URL, que seria o ID
+    }
+
+    var IdCliente = getIdFromUrl();
+
+    function Dialog() {
+        // Faz uma chamada AJAX para verificar se o cliente existe
+        console.log(IdCliente);
+        $.ajax({
+            url: '/Beneficiario/VerificarClienteExistente',
+            type: 'GET',
+            data: { idCliente: IdCliente },
+            success: function (clienteExiste) {
+                if (clienteExiste) {
+                    // Se o cliente existir, cria o modal e o exibe
+                    var random = Math.random().toString().replace('.', '');
+                    var texto = '<div id="' + random + '" class="modal fade">                                                               ' +
+                        '        <div class="modal-dialog">                                                                                 ' +
+                        '            <div class="modal-content">                                                                            ' +
+                        '                <div class="modal-header">                                                                         ' +
+                        '                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>         ' +
+                        '                    <h4 class="modal-title"> Beneficiários </h4>                                                   ' +
+                        '                </div>                                                                                             ' +
+                        '                <div class="modal-body">                                                                           ' +
+                        '                    <div class="row">                                                                               ' +
+                        '                      <div class="col-sm-4">                                                                       ' +
+                        '                         <div class="form-group">                                                                  ' +
+                        '                            <label for="cpf">CPF:</label>                                                          ' +
+                        '                            <input type="text" class="form-control" id="cpf" placeholder="Ex.:999.999.999-99" oninput="mascaraCPF(this)" maxlength="14"> ' +
+                        '                         </div>                                                                                    ' +
+                        '                      </div>                                                                                       ' +
+                        '                      <div class="col-sm-4">                                                                       ' +
+                        '                         <div class="form-group">                                                                  ' +
+                        '                            <label for="Name">Nome:</label>                                                        ' +
+                        '                            <input type="text" class="form-control" id="Name" placeholder="Ex.:Maria" maxlength="20"> ' +
+                        '                         </div>                                                                                    ' +
+                        '                      </div>                                                                                       ' +
+                        '                      <div class="col-sm-4" style="margin-top:27px;">                                              ' +
+                        '                         <div>                                                                                     ' +
+                        '                             <button type="submit" class="btn btn-sm btn-success" onclick="incluirBeneficiario()">Incluir</button> ' +
+                        '                         </div>                                                                                    ' +
+                        '                      </div>                                                                                             ' +
+                        '                    </div>                                                                                          ' +
+                        '                    <table class="table table-bordered">                                                          ' +
+                        '                        <thead>                                                                                   ' +
+                        '                            <tr>                                                                                  ' +
+                        '                                <th>CPF</th>                                                                        ' +
+                        '                                <th>Nome</th>                                                                     ' +
+                        '                                <th>Ações</th>                                                                    ' +
+                        '                            </tr>                                                                                 ' +
+                        '                        </thead>                                                                                  ' +
+                        '                        <tbody id="beneficiariosBody">                                                            ' +
+                        '                            <!-- Beneficiários serão carregados aqui -->                                           ' +
+                        '                        </tbody>                                                                                  ' +
+                        '                    </table>                                                                                      ' +
+                        '                </div>                                                                                             ' +
+                        '                <div class="modal-footer">                                                                         ' +
+                        '                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>             ' +
+                        '                </div>                                                                                             ' +
+                        '            </div><!-- /.modal-content -->                                                                         ' +
+                        '  </div><!-- /.modal-dialog -->                                                                                    ' +
+                        '</div> <!-- /.modal -->                                                                                        ';
+
+                    $('body').append(texto);
+                    $('#' + random).modal('show');
+
+                    // Carrega beneficiários para o modal
+                    carregarBeneficiarios(IdCliente);
+                } else {
+                    // Se o cliente não existir, exibe uma mensagem de erro
+                    alert('Cliente não encontrado. Por favor, cadastre um cliente antes de adicionar beneficiários.');
+                }
+            },
+            error: function () {
+                alert('Erro ao verificar a existência do cliente. O cliente deve ser Cadastrado Pimeiro.');
+            }
+        });
+    }
+
+    function carregarBeneficiarios(IdCliente) {
+        $.ajax({
+            url: '/Beneficiario/ObterBeneficiarios',
+            method: 'GET',
+            data: { id: IdCliente },
+            success: function (beneficiarios) {
+                var beneficiariosBody = $('#beneficiariosBody');
+                beneficiariosBody.empty();
+
+                if (beneficiarios && beneficiarios.length > 0) {
+                    beneficiarios.forEach(function (beneficiario) {
+                        var cpfFormatado = (beneficiario && beneficiario.CPF) ? formatarCPF(beneficiario.CPF) : '';
+                        var newRow = '<tr>' +
+                            '    <td>' + cpfFormatado + '</td>' +
+                            '    <td>' + beneficiario.Nome + '</td>' +
+                            '    <td>' +
+                            '        <input type="hidden" class="beneficiarioId" value="' + beneficiario.Id + '" />' +
+                            '        <button class="btn btn-primary btn-sm" onclick="alterarBeneficiario(' + beneficiario.Id + ')">Alterar</button> ' +
+                            '        <button class="btn btn-danger btn-sm" onclick="removerBeneficiario(this)">Excluir</button>' +
+                            '    </td>' +
+                            '</tr>';
+                        beneficiariosBody.append(newRow);
+                    });
+                } else {
+                    beneficiariosBody.append('<tr><td colspan="3" class="text-center">Nenhum beneficiário encontrado.</td></tr>');
+                }
+            },
+            error: function () {
+                console.log("Erro ao carregar beneficiário!");
+            }
+        });
+    }
+
+    function incluirBeneficiario() {
+        var beneficiario = {
+            CPF: $('#cpf').val(),
+            Nome: $('#Name').val(),
+            IdCliente: IdCliente
+        };
+
+        $.ajax({
+            url: '/Beneficiario/IncluirBeneficiario',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(beneficiario),
+            success: function (response) {
+                console.log("Resposta do servidor:", response);
+                var newRow = '<tr>' +
+                    '    <td>' + response.CPF + '</td>' +
+                    '    <td>' + response.Nome + '</td>' +
+                    '    <input type="hidden" class="beneficiarioId" value="' + response.Id + '" /> ' +
+                    '    <td>' +
+                    '        <button class="btn btn-primary btn-sm" onclick="alterarBeneficiario(' + response.Id + ')">Alterar</button> ' +
+                    '        <button class="btn btn-danger btn-sm" onclick="removerBeneficiario(this)">Excluir</button>' +
+                    '    </td>' +
+                    '</tr>';
+                $('#beneficiariosBody').append(newRow);
+            },
+            error: function () {
+                alert('Erro ao incluir o beneficiário.');
+            }
+        });
+    }
+
+    function removerBeneficiario(button) {
+        var id = $(button).closest('tr').find('.beneficiarioId').val();
+
+        $.ajax({
+            url: '/Beneficiario/ExcluirBeneficiario',
+            type: 'POST',
+            data: { id: id },
+            success: function (response) {
+                $(button).closest('tr').remove();
+                alert('Beneficiário excluído com sucesso.');
+            },
+            error: function () {
+                alert('Erro ao excluir o beneficiário.');
+            }
+        });
+    }
+
+    var IdBeneficiarioAtual;
+
+    function alterarBeneficiario(idBeneficiario) {
+
+        console.log("alterarBeneficiario chamado com id: " + idBeneficiario);
+        IdBeneficiarioAtual = idBeneficiario;
+
+        $.ajax({
+            url: '/Beneficiario/ObterBeneficiarios/',
+            type: 'GET',
+            data: { id: idBeneficiario },
+            success: function (response) {
+                console.log("Resposta recebida: ", response);
+
+                // Preencher os campos do modal
+                $('#cpf').val(response.cpf);
+                $('#Name').val(response.nome);
+                $('#Id').val(response.id);
+                $('#IdCliente').val(response.idCliente);
+
+                $('#beneficiariosBody tr').each(function () {
+                    var row = $(this);
+                    var hiddenId = row.find('.beneficiarioId').val();
+
+                    console.log("ID oculto na linha:", hiddenId, "ID retornado:", idBeneficiario); // Debug
+
+                    if (hiddenId == idBeneficiario.toString()) {
+                        console.log("Linha encontrada, alterando inputs."); // Debug
+                        row.find('td').eq(0).html('<input type="text" class="form-control" value="' + response.cpf + '" oninput="mascaraCPF(this)" maxlength="14" />');
+                        row.find('td').eq(1).html('<input type="text" class="form-control" value="' + response.nome + '" maxlength="20" />');
+                        row.find('td').eq(2).html('<button class="btn btn-danger btn-sm" onclick="salvarAlteracao()">Salvar</button>');
+                    }
+                });
+            },
+            error: function () {
+                alert('Erro ao carregar os dados do beneficiário.');
+            }
+        });
+    }
+
+    function salvarAlteracao() {
+        var beneficiario = {
+            Id: IdBeneficiarioAtual, // Usa o campo oculto para o ID
+            IdCliente: IdCliente, // ID do cliente agora armazenado corretamente
+            CPF: $('#beneficiariosBody tr input').eq(0).val(),
+            Nome: $('#beneficiariosBody tr input').eq(1).val()
+        };
+
+        console.log("Beneficiário para salvar:", beneficiario); // Confere os dados no console
+
+        $.ajax({
+            url: '/Beneficiario/AlterarBeneficiario',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(beneficiario),
+            success: function (response) {
+                $('#beneficiariosBody tr').each(function () {
+                    var row = $(this);
+                    if (row.find('.beneficiarioId').val() == beneficiario.Id) {
+                        row.find('td').eq(0).text(formatarCPF(beneficiario.CPF)); // Atualiza o CPF
+                        row.find('td').eq(1).text(beneficiario.Nome); // Atualiza o Nome
+                    }
+                });
+                alert('Alteração realizada com sucesso!');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Erro:', textStatus, errorThrown);
+                alert('Erro ao salvar as alterações do beneficiário. ' + textStatus + ': ' + errorThrown);
+            }
+        });
+    }
+</script>
+
+
+
